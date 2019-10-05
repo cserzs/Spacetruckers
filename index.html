@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="SpaceTruckersApp" ng-controller="MainController">
+<head>
+    <meta charset="utf-8">
+    <title>Space Truckers</title>
+    <!--
+    <link rel="stylesheet" href="bootstrap_v3.3.6/bootstrap.min.css">
+    -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <link href="css/st.css" rel="stylesheet" />
+
+    <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap_v3.3.6/bootstrap.min.js"></script>
+    -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+    <script type="text/javascript" src="lib/angular-1.7.8/angular.min.js"></script>
+    <script type="text/javascript" src="lib/angular-1.7.8/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="lib/angular-1.7.8/angular-animate.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <!-- growl -->
+    <link href="lib/angular-growl-2/angular-growl.min.css" rel="stylesheet">
+    <script src="lib/angular-growl-2/angular-growl.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.1.3/css/bootstrap-slider.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.1.3/bootstrap-slider.min.js"></script>
+    <script type="text/javascript" src="lib/angular_bootsrap_slider/slider.js"></script>
+
+    <script type="text/javascript" src="js/st/st.js"></script>
+    <script type="text/javascript" src="js/st/utils.js"></script>
+    <script type="text/javascript" src="js/st/gametables.js"></script>
+    <script type="text/javascript" src="js/st/crewrepair.js"></script>
+    <script type="text/javascript" src="js/st/fuelstore.js"></script>
+    <script type="text/javascript" src="js/st/jobmanager.js"></script>
+    <script type="text/javascript" src="js/st/passengertransport.js"></script>
+    <script type="text/javascript" src="js/st/shipyard.js"></script>
+    <script type="text/javascript" src="js/st/sparepartstore.js"></script>
+    <script type="text/javascript" src="js/st/location.js"></script>
+    <script type="text/javascript" src="js/st/messages.js"></script>
+    <script type="text/javascript" src="js/st/travel.js"></script>
+    <script type="text/javascript" src="js/st/crewfind.js"></script>
+    <script type="text/javascript" src="js/st/souvenirs.js"></script>
+    <!-- <script type="text/javascript" src="js/st/gameworld.js"></script> -->
+    <script type="text/javascript" src="js/st/scheduler.js"></script>
+    <script type="text/javascript" src="js/st/logbook.js"></script>
+    <script type="text/javascript" src="js/st/event.js"></script>
+    <script type="text/javascript" src="js/st/effect.js"></script>
+
+    <script type="text/javascript" src="js/app.js"></script>
+    <script type="text/javascript" src="js/controllers.js"></script>
+    <script type="text/javascript" src="js/services.js"></script>
+</head>
+<body>
+
+<div class="container" ng-if="Mainstate.intro" ng-controller="StartController">
+    <h2>Space Truckers</h2>
+    <h3>2231. Hanawei rendszer</h3>
+    <p>Miutan elozo munkahelyed csodbe ment, ugy dontottel, hogy sajat kezedbe veszed eleted alakitasat.<br/>
+        Osszes vagyonodat penzze tetted es egy nagy adag kolcsonbol vettel egy hosszujaratu, bolygokozi
+        utazasra kepes teherszallito urhajot.<br/>
+        Am ahhoz, hogy fuggetlen fuvaroskent a magad urad legy, elobb vissza kell fizetned a kolcsont.<br/>
+        <br/>
+        50 napod van ra, hogy osszegyujtsd a penzt!<br/>
+    </p>
+    <div class="text-center"><button class="btn btn-primary" ng-click="start()">Uj jatek</button></div>
+    <div class="text-center" ng-show="hasActiveGame"><button class="btn btn-primary" ng-click="continue()">Folytatas</button></div>
+
+    <p>
+        A jatek alapja az <a href="https://www.boardgamegeek.com/boardgame/14396/astronavis-merchant-advanced">AstroNavis Merchant Advanced</a> tarsasjatek! 
+        </p>
+    
+    <h3><a ng-click="todoVisible = !todoVisible">Feladatok</a></h3>
+    <ul ng-show="todoVisible">
+        <li><b>Jatekmenet</b>
+            <ul>
+                <li><del>sebesseg allitas</del></li>
+                <li><del>helyszineket osszekeverni</del></li>
+                <li><del>utazaskor, ha nincs eleg fuel, akkor a deep space-be kot ki => game over</del></li>
+                <li><del>deep space: pozicio a melyurben</del></li>
+                <li><del>load/unload: port cargo gear-t figyelembe venni</del></li>
+                <li>load/unload: ha a meret 1, akkor lehetne kevesebb ido a be- es kirakodas</li>
+                <li>Crew repair: sikertelen javitas kell? (sparepart nem fogy, csak az ido megy)</li>
+                <li><b>Passengers:</b> <del>fizettseg szamolas</del></li>
+                <li><b>Passengers:</b> <del>x nap utan nem fizetnek</del></li>
+                <li>jatekido: evszamot kijelezni</li>
+                <li>kezdeskor par dolgot valasztani pl: kolcson</li>
+                <li>ertekek finomhangolasa</li>
+                <li>a tarsasban lathato tablazatos kijelzes => budget funkcio (a penz valtozasanak a kovetese)</li>
+                <li>i8n</li>
+            </ul>
+        </li>
+        <li>
+            <b>weblap</b>
+            <ul>
+                <li>kezdolap: regisztracio, belepes</li>
+                <li>main: uj jatek, folytatas, scoreboard</li>
+            </ul>
+        </li>
+        <li><b>Travel</b>
+            <ul>
+                <li><del>utazas utan frissiteni a kikotoi adatokat</del></li>
+                <li><del>engine allapota romlik</del></li>
+                <li><del>utazaskor csak azt nezi, hogy fuel>0, nem azt, hogy pontosan meg van-e, az a jatekos feladata</del></li>
+            </ul>
+        </li>
+        <li><b>Program functions</b>
+            <ul>
+                <li><b>Scheduler</b>: az add-nal ST.Player legyen</li>
+                <li><b>Sparepart store:</b> <del>ha 0, akkor is lehet vasarolni</del></li>
+                <li><b>Map:</b> <del>ha ki van valasztva egy uticel es a wait-t nyomok, akkor nem tunik el es esetleg nem lesz aktualis</del></li>
+                <li><b>Travel:</b> a forceTravel helyett, egy travelToClosestDeepspace-t</li>
+                <li>Save</li>
+                <li>Load</li>
+                <li>Regisztracio</li>
+            </ul>
+        </li>
+        <li><b>Logbook</b>
+            <ul>
+                <li><del>az Msg.get fuggvenyt atrakni az ST-be</del></li>
+                <li>idozitett kiiras (var fel masodpercet, mielott kiirja a kovetkezo uzenetet, olyan erzes, mintha eltelt volna az ido)</li>
+                <li>kesleltetett kiiras: <del>megadott idopontban jelenik meg a szoveg</del></li>
+                <li><del>log funkcio az ido mulasahoz</del></li>
+                <li><del>hard_worker_sailor: logba irni, ha kilep a matroz</del></li>
+            </ul>
+        </li>
+        <li><b>Gameworld:</b> <del>daily expense</del></li>
+        <li><b>UI :</b> <del>button disabled: csak a kinezet lenne disabled, ha raklikelunk, akkor kiirja miert disabled</del></li>
+        <li><b>UI :</b> uj elrendezes, </li>
+        <li><b>Location:</b> <del>egyedi jellemzok</del></li>
+        <li><b>Location:</b> <del>az effects tombot klonozni (most referenciat ad at)</del></li>
+        <li><b>Souvenirs:</b> <del>mukodese</del></li>
+        <li><b>Action manager:</b> <del>az ANY action kezelese</del></li>
+        <li><b>Events</b>
+            <ul>
+                <li><del>event lejartanak kezelese (pl: ha 6 oraig tart)</del></li>
+                <li>decontamination: <del>idozitett kiiras, amikor az unload kesz, csak akkor jelenjen meg a szoveg;</del> <del>ne irja ki az eventet-t</del></li>
+                <li>high_traffic: <del>idozitett kiiras</del></li>
+                <li><b>decontamination</b>: az unload message utan modositja az idot!</li>
+            </ul>
+        </li>
+    </ul>
+    <br/>
+    <br/>
+</div>
+
+<div ng-if="Mainstate.game" ng-controller="GameController">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+    
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#nav-toggle">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a ng-click="home()" class="navbar-brand">Space Truckers</a>
+        </div>
+    
+        <div class="collapse navbar-collapse" id="nav-toggle">
+            <ul class="nav navbar-nav">
+                <li><a ng-click="showGameWindow(ST.GAMEWINDOW.map)">Terkep</a></li>
+                <li><a ng-click="showGameWindow(ST.GAMEWINDOW.location)">Urkikoto</a></li>
+                <li><a ng-click="showGameWindow(ST.GAMEWINDOW.ship)">Urhajo</a></li>
+                <li><a ng-click="showGameWindow(ST.GAMEWINDOW.log)">Hajonaplo</a></li>
+                <li class="dropdown"><a class="dropdown-toggle showpointer" data-toggle="dropdown">Varakozas <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a ng-click="wait(1)">1 ora</a></li>
+                        <li><a ng-click="wait(6)">6 ora</a></li>
+                        <li><a ng-click="wait(12)">12 ora</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    
+        </div>
+    </nav>
+    
+    <div class="navbar navbar-default navbar-fixed-top navbar-second">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">{{ST.gameDate|gametime}} ({{ST.turn}}. turn)</div>
+                <div class="col-md-4"><strong>{{ST.currentLocation.name}}</strong></div>
+                <div class="col-md-3">{{ST.money}} kredit</div>
+                <div class="col-md-2">Uzemanyag: {{ST.fuel.current}}</div>
+            </div>
+            <div class="row text-center st-event_desc">{{getEventDesc()}}</div>
+        </div>
+    </div>
+
+    <div class="container main_content">
+
+    <div ng-if="Gamestates.map" ng-controller="MapController">
+            <h3>Navigacio</h3>
+            <div class="row">
+                <div class="col-md-3 text-center"><strong>Sebesseg</strong><br/>
+                    <span slider style="width: 200px;" slider-tooltip="hide" ng-model="ST.currentspeed" ticks="[1, 2, 3]" ticks-labels='["Lassu", "Kozepes", "Gyors"]' min="1" max="3" step="1" on-stop-slide="speedControl.setSpeed(value, $event)"></span>
+                </div>
+                <div class="col-md-3"><p class="bg-danger text-center" ng-show="speedControl.overdrive"><strong>Figyelem!<br/>Hajtomu tulterheles!</strong></p></div>
+                <div class="col-md-4">
+                    <div ng-show="hasDestination()">
+                        <strong>{{ ST.Travel.destination.name }}</strong><br/>
+                        Tavolsag: {{ST.Travel.distance }}<br/>
+                        Utazas ideje: {{ST.Travel.duration}} ora, ez {{ST.Travel.duration | turnToDuration}} <br/>
+                        Uzemanyag szukseglet: {{ST.Travel.ftlFuel}} + {{ST.Travel.maneuverFuel}} a manoverezeshez<br/>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <button class="btn" ng-class="isFunctionDisabled(getTravelStatus()) ? 'btn-default': 'btn-primary'" ng-show="hasDestination()" ng-click="travel()">Hajtomu inditas</button>
+                </div>
+            </div>
+        
+            <h3>Urkikotok</h3>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Koordinata</th>
+                    <th>Nev</th>
+                    <th>Lakossag</th>
+                    <th>Kikoto felszereltsege</th>
+                    <th>Leiras</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="maprow" ng-click="selectDestination(location)" ng-repeat="location in ST.locations | filter:locationFilter">
+                    <td><span ng-show="location == ST.currentLocation">@</span></td>
+                    <td>{{location.coord}}</td>
+                    <td>{{location.name}}</td>
+                    <td>{{location.population}}</td>
+                    <td>{{location.portLevel}}</td>
+                    <td>{{location.shortDesc}}</td>
+                </tr>
+                </tbody>
+            </table>
+    </div>
+    
+    
+    <div ng-if="Gamestates.spaceport" ng-controller="SpaceportController">
+            <h3>{{ST.currentLocation.name }}</h3>
+            <p>Lakossag: {{ ST.currentLocation.population}}<br/>
+                Urkikoto felszereltsege: {{ ST.currentLocation.portLevel}}<br/>
+                {{ ST.currentLocation.shortDesc}}</p>
+        
+            <h3>Hajojavito</h3>
+            <p>A javitas koltsege {{ST.Shipyard.getRepairPrice()}} kredit es {{repairTime}} orat vesz igenybe.</p>
+            <p>Egy uj hajomodul beszerelese {{upgradeTime}} orat igenyel.</p>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Hajomodul</th>
+                    <th>Max</th>
+                    <th>Aktualis</th>
+                    <th>Javitas</th>
+                    <th>Fejlesztes</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Hajtomu</td>
+                    <td>{{ST.engine.max}}</td>
+                    <td>{{ST.engine.current}}</td>
+                    <td>
+                        <button class="btn btn-sm" ng-class="isFunctionDisabled(getRepairStatus(ST.engine)) ? 'btn-default': 'btn-primary'" ng-click="repair(ST.engine)">Javitas</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm" ng-class="isFunctionDisabled(getUpgradeStatus(ST.engine)) ? 'btn-default': 'btn-primary'" ng-click="upgrade(ST.engine)">Fejlesztes</button> {{ST.Shipyard.upgradePrice.engine}} kr
+                    </td>
+                </tr>
+                <tr>
+                    <td>Hajotest</td>
+                    <td>{{ST.hull.max}}</td>
+                    <td>{{ST.hull.current}}</td>
+                    <td>
+                        <button class="btn btn-sm" ng-class="isFunctionDisabled(getRepairStatus(ST.hull)) ? 'btn-default': 'btn-primary'" ng-click="repair(ST.hull)">Javitas</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm" ng-class="isFunctionDisabled(getUpgradeStatus(ST.hull)) ? 'btn-default': 'btn-primary'" ng-click="upgrade(ST.hull)">Fejlesztes</button> {{ST.Shipyard.upgradePrice.hull}} kr
+                    </td>
+                </tr>
+                <tr>
+                    <td>Rakodo daru</td>
+                    <td>{{ST.cargogear.max}}</td>
+                    <td>{{ST.cargogear.current}}</td>
+                    <td>
+                        <button class="btn btn-sm" ng-class="isFunctionDisabled(getRepairStatus(ST.cargogear)) ? 'btn-default': 'btn-primary'" ng-click="repair(ST.cargogear)">Javitas</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm" ng-class="isFunctionDisabled(getUpgradeStatus(ST.cargogear)) ? 'btn-default': 'btn-primary'" ng-click="upgrade(ST.cargogear)">Fejlesztes</button> {{ST.Shipyard.upgradePrice.cargogear}} kr
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        
+            <h3>Uzlet</h3>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nev</th>
+                    <th>Mennyiseg</th>
+                    <th>Ar</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Alkatreszek</td>
+                    <td>{{ ST.SparepartStore.quanity}}</td>
+                    <td>{{ST.SparepartStore.price}} cr</td>
+                    <td><button class="btn btn-sm" ng-class="isFunctionDisabled(getBuySparepartStatus()) ? 'btn-default': 'btn-primary'" ng-click="buySparepart()">Vasarlas</button></td>
+                </tr>
+                <tr>
+                    <td>Uzemanyag</td>
+                    <td>{{ ST.FuelStore.quanity}}</td>
+                    <td>{{ST.FuelStore.price}} cr</td>
+                    <td><button class="btn btn-sm" ng-class="isFunctionDisabled(getBuyFuelStatus()) ? 'btn-default': 'btn-primary'" ng-click="buyFuel()">Vasarlas</button></td>
+                </tr>
+                </tbody>
+            </table>
+        
+            <h3>Munkak</h3>
+            <p>Szabad kapacitas: {{ST.jobs.getFreeCapacity()}}</p>
+            <p>Az aru berakodasa {{loadTime}} orat vesz igenybe.</p>
+            <div class="well well-sm" ng-hide="ST.JobManager.hasJob()">Nincs munka!</div>
+            <table class="table" ng-show="ST.JobManager.jobs.length > 0">
+                <thead>
+                <tr>
+                    <th>Rakomany</th>
+                    <th>Celallomas</th>
+                    <th>Meret</th>
+                    <th>Fizettseg</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="job in ST.JobManager.jobs">
+                    <td>{{job.cargo.name}}</td>
+                    <td>{{job.destination.name}}</td>
+                    <td>{{job.size}}</td>
+                    <td>{{job.payment}} cr</td>
+                    <td><button class="btn btn-sm" ng-class="isFunctionDisabled(getAcceptJobStatus(job)) ? 'btn-default': 'btn-primary'" ng-click="acceptJob(job)">Berakodas</button></td>
+                </tr>
+                </tbody>
+            </table>
+        
+            <h3>Utasok</h3>
+            <p>Szabad hely: {{ST.passengers.getFreeCapacity()}}</p>
+            <div class="well well-sm" ng-hide="ST.PassengerTransport.hasPassengers()">Nincsennek uatasok!</div>
+            <div class="list-group">
+                <div class="list-group-item" ng-repeat="group in ST.PassengerTransport.groups">
+                    Celallomas: {{group.destination.name}} / {{group.num}} szemely (2 kr / tavolsag) <button class="btn btn-sm" ng-class="isFunctionDisabled(getPassengerEmbarkStatus(group)) ? 'btn-default': 'btn-primary'" ng-click="passengerEmbark(group)">1 szemely elszallasolasa</button>
+                </div>
+            </div>
+        
+            <h3>Szuvenirek</h3>
+            <div class="list-group">
+                <div class="list-group-item" ng-repeat="sv in ST.SouvenirsManager.available">
+                    {{sv.name}}, ar: {{sv.price}} kr 
+                    <button class="btn btn-sm" ng-class="isFunctionDisabled(getSouvenirBuyStatus(sv)) ? 'btn-default': 'btn-primary'" ng-click="buySouvenir(sv)">Vetel</button>
+                </div>
+            </div>
+        
+            <h3>Legenysegi tag felberelese</h3>
+            <div class="well well-sm" ng-hide="ST.CrewFind.hasWorker()">Nincsennek munkasok!</div>
+            <div ng-show="ST.CrewFind.hasWorker()">{{ST.CrewFind.available}} munkas keres munkat <button class="btn btn-sm" ng-class="isFunctionDisabled(getCrewHireStatus()) ? 'btn-default': 'btn-primary'" ng-click="hire()">Felbereles (1 ora / munkas)</button></div>
+            <br/>
+            <br/>
+    </div>
+    
+    
+    <div ng-if="Gamestates.deepspace" ng-controller="DeepspaceController">
+    A melyurben vagy.
+    </div>
+    
+    
+    <div ng-if="Gamestates.ship" ng-controller="ShipController">
+            <h2>Hajo</h2>
+        
+            <h3>Hajo rendszerek</h3>
+            <!--<p>The repair takes {{repairTime}} hours and need 1 sparepart!</p>-->
+            <p>A javitas {{repairTime}} orat vesz igenybe es 1 alkatresz szukseges hozza!</p>
+            <div class="list-group">
+                <div class="list-group-item">Hajtomu: {{ST.engine.max}} / {{ST.engine.current}} <button class="btn btn-sm" ng-class="isFunctionDisabled(getRepairStatus(ST.engine)) ? 'btn-default': 'btn-primary'" ng-click="repair(ST.engine)">Javitas</button></div>
+                <div class="list-group-item">Hajotest: {{ST.hull.max}} / {{ST.hull.current}} <button class="btn btn-sm" ng-class="isFunctionDisabled(getRepairStatus(ST.hull)) ? 'btn-default': 'btn-primary'" ng-click="repair(ST.hull)">Javitas</button></div>
+                <div class="list-group-item">Rakodo daru: {{ST.cargogear.max}} / {{ST.cargogear.current}} <button class="btn btn-sm" ng-class="isFunctionDisabled(getRepairStatus(ST.cargogear)) ? 'btn-default': 'btn-primary'" ng-click="repair(ST.cargogear)">Javitas</button></div>
+                <div class="list-group-item">Kabinok: {{ST.passengers.capacity}} / {{ST.passengers.getFreeCapacity()}} szabad</div>
+                <div class="list-group-item">Rakter: {{ST.jobs.capacity}} / {{ST.jobs.getFreeCapacity()}} szabad</div>
+                <div class="list-group-item">Legenyseg: {{ST.crew.max}} / {{ST.crew.current}}</div>
+                <div class="list-group-item">Alkatreszek: {{ST.spareparts.current}}</div>
+                <div class="list-group-item">Szuvenir kapacitas: {{ST.SOUVENIR_CAPACITY}}</div>
+            </div>
+        
+        
+            <h3>Rakter</h3>
+            <div class="well well-sm" ng-hide="ST.jobs.hasJob()">Nincs rakomany!</div>
+            <div ng-show="ST.jobs.getSum() > 0">A kirakodas {{unloadTime}} orat vesz igenybe!</div>
+            <div class="list-group">
+                <div class="list-group-item" ng-repeat="job in ST.jobs.list">
+                    {{job.cargo.name}}, cel: {{job.destination.name}}, meret: {{job.size}}, fizettseg: {{job.payment}} cr
+                    <button class="btn btn-sm" ng-class="isFunctionDisabled(getCompleteJobStatus(job)) ? 'btn-default': 'btn-primary'" ng-click="completeJob(job)">Unload</button>
+                </div>
+            </div>
+        
+        
+            <h3>Utasok</h3>
+            <div class="well well-sm" ng-hide="ST.passengers.hasPassengers()">Nincsennek utasok!</div>
+            <table class="table" ng-show="ST.passengers.hasPassengers()">
+                <thead>
+                    <tr>
+                        <td>Honnan</td>
+                        <td>Hova</td>
+                        <td>Indulas ideje</td>
+                        <td>Letszam</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="group in ST.passengers.groups">
+                        <td>{{group.startLocation.name}}</td>
+                        <td>{{group.destination.name}}</td>
+                        <td>{{group.departureTurn|turnToGamedate}}</td>
+                        <td>{{group.num}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        
+        
+            <h3>Szuvenirek</h3>
+            <div class="well well-sm" ng-hide="ST.souvenirs.getSum() > 0">Nincsennek szuvenirek!</div><!-- There are no souvenirs!-->
+            <div class="list-group">
+                <div class="list-group-item" ng-repeat="sv in ST.souvenirs.getAll()">{{sv.name}}, mennyiseg: {{sv.num}} (veteli ar: {{sv.price}} kr), eladasi ar: {{ ST.SouvenirsManager.get(sv.id).price }}  kr
+                    <button class="btn btn-primary btn-sm" ng-class="isFunctionDisabled(getSouvenirSellStatus(sv)) ? 'btn-default': 'btn-primary'" ng-click="sellSouvenir(sv)">Sell</button>
+                </div>
+            </div>
+        
+    </div>
+    
+    
+    <div ng-if="Gamestates.log" ng-controller="LogController">
+        <p>
+            Kolcson osszege: {{ST.loanAmount}} kredit<br/>
+            A torlesztesig hatralevo ido: {{ST.timeLimit - ST.day + 1}} nap<br/>
+            Eltelt napok: {{ST.day - 1}} nap<br/>
+            <button ng-click="repay()">Kolcson visszafizetese</button><br/>
+            <br/>
+            Megtett tavolsag: {{ST.statistic.distance}}<br/>
+            <div ng-show="advertisementEvent">
+                STA reklam szerzodes: 10 kredit / nap<br/>
+            </div>
+            <div ng-show="environmentTax">
+                Kornyezetvedelmi ado: {{ST.ENVIROMENT_PROTECTION_TAX}} kredit
+            </div>
+        </p>
+        <h3>Az elmult 5 nap esemenyei</h3>
+        <div class="list-group">
+            <div class="list-group-item" ng-repeat="log in ST.Logbook.logs">{{ logFormat(log)}}</div>
+        </div>
+    </div>
+    
+    <div id="custom-modal2" ng-if="Gamestates.advancetime" ng-controller="TimeController">
+            <div id="overlay2">
+                <h4></h4>
+                <div class="list-group">
+                    <div class="list-group-item" ng-repeat="log in messages">{{log}}</div>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-default center-block" ng-show="closeButtonVisible" ng-click="close()">Bezar</button>
+                </div>
+            </div>
+            <!--<div id="fade"></div>-->
+    </div>
+        
+    <div id="custom-modal2" ng-if="Gamestates.event_corrupt_port_boss" ng-controller="EventCorrputPortBossController">
+            <div id="overlay2">
+                <h4 class="modal-title">A kikotofonok</h4>
+                <div>
+                    A kikotofonok ugy latja nincs minden rendben a hajopapirokkal,<br/>
+                    de nagyvonaluan felajanlja, hogy egy kisebb osszegert ({{price}} credit) megoldja nekunk ezt az aprosagot.<br/>
+                    Ha nem fizetunk, el kell hagyni a kikotot!
+                </div>
+                <div class="center-block">
+                    <button type="button" class="btn btn-default" ng-click="pay()">Fizetek</button>
+                    <button type="button" class="btn btn-default" ng-click="notpay()">Nem fizetek</button>
+                </div>
+        
+            </div>
+            <!--<div id="fade"></div>-->
+        </div>
+        
+        <div ng-if="Gamestates.event_hard_worker_sailor" ng-controller="EventHardWorkerSailorController">
+            <div>
+                <h4>Elegedetlen matroz</h4>
+                <div>
+                    Egy legenysegi tag elegedetlen a kemeny munkaval, ezert fel akar mondani.<br/>
+                    Hagyod elmenni vagy egy kis premiummal (50 credit) visszacsabitod?
+                </div>
+                <div>
+                    <button type="button" class="btn btn-default" ng-click="letgo()">Hadd menjen</button>
+                    <button type="button" class="btn btn-default" ng-click="pay()">Premium</button>
+                </div>
+            </div>
+
+        </div> 
+        
+        
+        <div ng-if="Gamestates.event_wild_party" ng-controller="EventWildPartyController">
+            <h4>Fektelen ejszaka</h4>
+            <div>A legenyseg {{arrestedCrew}} tagja tulzasba vitte az ejszakai mulatozast, ezert a parti egy rendorsegi zarkaban ert veget.<br/>
+                Kifizeted a birsagot ({{fine}} credit) vagy uljek le a buntetesuket (-{{arrestedCrew}} crew)?
+            </div>
+            <div class="center-block">
+                <button type="button" class="btn btn-default" ng-click="notpay()">Nem fizetek</button>
+                <button type="button" class="btn btn-default" ng-click="pay()">Fizetek</button>
+            </div>
+
+        </div>
+        
+        <div ng-if="Gamestates.event_contraband" ng-controller="EventContrabandController">
+            <h4>Csempeszaru</h4>
+            <div>
+                A kikotofelugyelet csempeszarut talalt a hajo raktereben, ezert<br/>
+                {{fine}} kredit birsagot allapitott meg!<br/>
+                Vagy fizetek vagy el kell hagyni a kikotot!
+            </div>
+            <div class="center-block">
+                <button type="button" class="btn btn-default" ng-click="pay()">Fizetek</button>
+                <button type="button" class="btn btn-default" ng-click="notpay()">Nem fizetek</button>
+            </div>
+
+        </div>
+
+
+        <div ng-if="Gamestates.event_wreck_traction" ng-controller="EventWreckTractionController">
+            <h4>Roncs vontatas</h4>
+            <div>
+                Az ugyfel munkaajanlattal erkezett.<br/>
+                Egy epitkezes utan maradt, mintegy 270 000 tonna vashulladekot kell bevontatni es orbitalis palyara allitani.<br/>
+                Ott majd a helyi munkasok, rovidjaratu geppel feldolgozzak.<br/>
+                A roppalya szamitasok alapjan munka 12 ora alatt elvegezheto. A manoverezesek es a<br/>
+                vontatas 10 egyseg uzemanyagot igenyelnek.<br/>
+                A fizettseg 130 credit.
+            </div>
+            <div class="center-block">
+                <button type="button" class="btn btn-default" ng-click="takeOn()">Elvallalom</button>
+                <button type="button" class="btn btn-default" ng-click="refuse()">Nem vallalom</button>
+            </div>
+        </div>        
+
+        <div ng-if="Gamestates.event_advertisement" ng-controller="EventAdvertisementController">
+            <h4>Mozgo reklam</h4>
+            <div>
+                A kepernyon az STA reklamiroda menedzsere jelenik meg elegans oltonyeben.<br/>
+                Egy ujfajta reklamtechnikarol beszel, aminek a lenyege, hogy a hajo egy mozgo<br/>
+                reklamfelulet lenne. A burkolaton mozgo hirdetesek es markajelek lennenek,<br/>
+                a hajo pedig szlogeneket sugarozna.<br/>
+                Az STA biztositja a szukseges technikat, amit ingyenesen beszerel a hajoba. Az eszkoz<br/>
+                viszonylag nagy helyigenye miatt kis atalakitast kell vegrehajtani a hajon<br/>
+                (fuel capacity -20)<br/>
+                A ceg a reklamert napi 10 creditet fizet.
+            </div>
+            <div class="center-block">
+                <button type="button" class="btn btn-default" ng-click="takeOn()">Elvallalom</button>
+                <button type="button" class="btn btn-default" ng-click="refuse()">Nem vallalom</button>
+            </div>
+        </div>
+
+
+    </div><!--container-->
+
+
+</div>
+
+<div class="container" ng-if="Mainstate.win" ng-controller="WinController">
+    <h3>S Z A B A D S A G !</h3>
+    <p>Sikerult visszafizetned a hitelt a banknak. Most mar a magad ura vagy!</p>
+    <p>A jovod mar csak rajtad mulik!</p>
+    <p>Maradek penzed: {{ST.money}} kredit</p>
+    <p>Pontszam: {{ST.statistic.point}}</p>
+    <p>Megtett tavolsag: {{ST.statistic.distance}}</p>
+    <a ng-click="home()" class="btn btn-primary">Kezdolap</a>
+</div>
+
+<div class="container" ng-if="Mainstate.lose" ng-controller="LoseController">
+    <h3>K U D A R C !</h3>
+    <p>Hat ez nem sikerult!</p>
+    <p>{{reason}}</p>
+    <p>Pontszam: {{ST.statistic.point}}</p>
+    <p>Megtett tavolsag: {{ST.statistic.distance}}</p>
+    <a ng-click="home()" class="btn btn-primary">Kezdolap</a>
+</div>
+
+
+<div growl limit-messages="3"></div>
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+
+http://janstevens.github.io/angular-growl-2/
+
+0.6.0
